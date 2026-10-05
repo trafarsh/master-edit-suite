@@ -18,12 +18,59 @@ function lerp(a: Value, b: Value, f: number): Value {
   return f < 1 ? a : b;
 }
 
+export class KeyframeEase {
+  constructor(public speed: number, public influence: number) {}
+}
+
+export const KeyframeInterpolationType = { LINEAR: 6612, BEZIER: 6613, HOLD: 6614 };
+
+interface Key {
+  time: number;
+  value: Value;
+  inEase?: KeyframeEase[];
+  outEase?: KeyframeEase[];
+  inType?: number;
+  outType?: number;
+}
+
 export class Property {
-  keys: { time: number; value: Value }[] = [];
+  keys: Key[] = [];
   expression = "";
   expressionEnabled = false;
   dimensionsSeparated = false;
+  canVaryOverTime = true;
+  isSpatial = false;
+  selectedKeys: number[] = [];
   constructor(public matchName: string, public value: Value, public name = matchName) {}
+  /** Ease arrays have one entry per dimension, or one for spatial properties. */
+  private easeDims() {
+    return this.isSpatial || typeof this.value === "number" ? 1 : (this.value as number[]).length;
+  }
+  private defaultEase() {
+    return Array.from({ length: this.easeDims() }, () => new KeyframeEase(0, 16.666667));
+  }
+  keyInTemporalEase(i: number) {
+    return this.keys[i - 1].inEase ?? this.defaultEase();
+  }
+  keyOutTemporalEase(i: number) {
+    return this.keys[i - 1].outEase ?? this.defaultEase();
+  }
+  setTemporalEaseAtKey(i: number, inEase: KeyframeEase[], outEase?: KeyframeEase[]) {
+    const dims = this.easeDims();
+    if (inEase.length !== dims || (outEase && outEase.length !== dims)) throw new Error("ease dimension mismatch");
+    this.keys[i - 1].inEase = inEase;
+    this.keys[i - 1].outEase = outEase ?? inEase;
+  }
+  keyInInterpolationType(i: number) {
+    return this.keys[i - 1].inType ?? KeyframeInterpolationType.LINEAR;
+  }
+  keyOutInterpolationType(i: number) {
+    return this.keys[i - 1].outType ?? KeyframeInterpolationType.LINEAR;
+  }
+  setInterpolationTypeAtKey(i: number, inType: number, outType?: number) {
+    this.keys[i - 1].inType = inType;
+    this.keys[i - 1].outType = outType ?? inType;
+  }
   get numKeys() {
     return this.keys.length;
   }
@@ -228,6 +275,11 @@ export class Layer {
   setParentWithJump(p: Layer | null) {
     this.parent = p;
   }
+  moveBefore(other: Layer) {
+    const list = this.comp.layerList;
+    list.splice(list.indexOf(this), 1);
+    list.splice(list.indexOf(other), 0, this);
+  }
 }
 export class AVLayer extends Layer {}
 export class TextLayer extends AVLayer {}
@@ -238,6 +290,7 @@ export class LightLayer extends Layer {}
 export class CompItem extends Item {
   layerList: Layer[] = [];
   selectionOrder: Layer[] = [];
+  selectedProperties: (Property | PropertyGroup)[] = [];
   time = 0;
   frameRate = 30;
   pixelAspect = 1;
@@ -268,6 +321,10 @@ export class CompItem extends Item {
         const l = this.addLayer(new AVLayer("Null"), 0, duration);
         l.nullLayer = true;
         return l;
+      },
+      addSolid: (_color: number[], name: string, width: number, height: number, _pa: number, duration = this.duration) => {
+        const solid = project.addItem(new FootageItem(name, new SolidSource(), true, false, width, height));
+        return this.addLayer(new AVLayer(name), 0, duration, { source: solid });
       },
     };
   }
@@ -363,6 +420,10 @@ export function createHost() {
     PurgeTarget: { ALL_CACHES: 1 },
     ParagraphJustification: { LEFT_JUSTIFY: 1 },
     RQItemStatus: { QUEUED: 1 },
+    SceneEditDetectionMode: { MARKERS: 1, SPLIT: 2, SPLIT_PRECOMP: 3, NONE: 4 },
+    Property,
+    KeyframeEase,
+    KeyframeInterpolationType,
   });
   vm.runInContext(bundleHost(), context);
 

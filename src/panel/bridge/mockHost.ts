@@ -88,6 +88,7 @@ function state(): HostState {
     project: { name: "short-edit.aep", saved: true, numItems: 24 },
     comp: mock.hasComp ? comp : null,
     selection: mock.hasComp ? layers.filter((l) => mock.selection.includes(l.index)) : [],
+    keys: mock.hasComp && mock.selection.length ? { properties: 1, pairs: 2 } : { properties: 0, pairs: 0 },
   };
 }
 
@@ -110,6 +111,10 @@ const UNDO: Record<string, string> = {
   "project.resizeLayers": "Resize and Center",
   "project.reframeComp": "Reframe Comp",
   "project.tidyBin": "Tidy Project Bin",
+  "cuts.detect": "Detect Cuts",
+  "cuts.split": "Split at Cuts",
+  "cuts.adjustmentPerCut": "Adjustment Layer per Cut",
+  "ease.apply": "Apply Ease",
 };
 
 export async function mockCall(action: string, args: unknown): Promise<string> {
@@ -167,6 +172,11 @@ export async function mockCall(action: string, args: unknown): Promise<string> {
         "audio.fade": { layers: n, seconds: a.seconds },
         "audio.volume": { layers: n, keys: 0, db: a.db },
         "project.resizeLayers": { resized: n },
+        "cuts.detect": { cuts: 3, times: [1, 2, 3] },
+        "cuts.split": { shots: 4 },
+        "cuts.adjustmentPerCut": { shots: 4, cuts: 3 },
+        "ease.apply": { pairs: 2, properties: 1 },
+        "ease.read": { curve: [0.7, 0, 0.2, 1], property: "Scale" },
       };
       if (!(action in results)) return fail(`Unknown host action: ${action}`, "unknown_action");
       if (!n && action !== "arrange.duplicateComp") return fail("Select at least one layer.", "selection");

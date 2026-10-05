@@ -30,6 +30,7 @@ export function needsProject(state: HostState | null): Availability {
 
 export interface LayerRule {
   min?: number;
+  max?: number;
   kinds?: LayerKind[];
   /** Extra filter, e.g. layers with audio. */
   where?: (l: LayerInfo) => boolean;
@@ -55,7 +56,20 @@ export function needsLayers(state: HostState | null, rule: LayerRule = {}): Avai
     const lockedHint = !rule.allowLocked && state.selection.some((l) => l.locked) ? " (locked layers don't count)" : "";
     return { enabled: false, target: "", reason: `Select ${what}${lockedHint}`, layers: matching };
   }
+  if (rule.max !== undefined && state.selection.length > rule.max) {
+    const what = rule.max === 1 ? `one ${noun}` : `${rule.max} ${noun}s`;
+    return { enabled: false, target: "", reason: `Select only ${what}`, layers: matching };
+  }
   return { enabled: true, target: plural(matching.length, noun), layers: matching };
+}
+
+/** Cuts: one footage clip without time remapping (scene detection fails on those). */
+export function needsSceneClip(state: HostState | null): Availability {
+  const a = needsLayers(state, { kinds: ["footage"], min: 1, max: 1, noun: "footage clip" });
+  if (a.enabled && a.layers[0].timeRemap) {
+    return { enabled: false, target: "", reason: "Turn off time remapping first; scene detection fails on it", layers: a.layers };
+  }
+  return a.enabled ? { ...a, target: a.layers[0].name } : a;
 }
 
 export const VISUAL_KINDS: LayerKind[] = ["footage", "still", "precomp", "text", "shape", "solid"];

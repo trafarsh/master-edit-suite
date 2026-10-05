@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useStore } from "../app/store";
 import { ActionButton, Hint, NumberField, Planned, Section, Tabs } from "../components/ui";
 import { plural } from "../core/format";
-import { needsComp, needsLayers, rules, type Availability } from "../core/requirements";
+import { needsComp, needsLayers, needsSceneClip, rules, type Availability } from "../core/requirements";
 
 type Tab = "arrange" | "audio" | "color" | "cuts";
 
@@ -32,16 +32,7 @@ export function General() {
           ]}
         />
       )}
-      {tab === "cuts" && (
-        <Planned
-          phase={2}
-          items={[
-            "Detect cuts inside one selected footage clip (After Effects scene edit detection)",
-            "Split at cuts: one layer per shot",
-            "Adjustment layer per cut, ready for per-shot grading",
-          ]}
-        />
-      )}
+      {tab === "cuts" && <Cuts />}
     </>
   );
 }
@@ -186,5 +177,41 @@ function Audio() {
         <Planned phase={2} items={["Advanced reverb: built-in Reverb effect with a tuned preset (P2)"]} />
       </Section>
     </>
+  );
+}
+
+function Cuts() {
+  const { state, run, setProgress } = useStore();
+  const clip = needsSceneClip(state);
+  // Scene detection analyses the whole clip and blocks After Effects while it runs.
+  const detect = async (action: string, success: (r: any) => string) => {
+    setProgress({ title: `Detecting cuts in ${clip.target}… After Effects is busy until it finishes.`, fraction: null });
+    try {
+      await run(action, {}, { success });
+    } finally {
+      setProgress(null);
+    }
+  };
+  return (
+    <Section title="Scene edits">
+      <div className="grid">
+        <ActionButton
+          label="Detect cuts"
+          avail={clip}
+          onClick={() => detect("cuts.detect", (r) => (r.cuts ? `Marked ${plural(r.cuts, "cut")}` : "No cuts found"))}
+        />
+        <ActionButton
+          label="Split at cuts"
+          avail={clip}
+          onClick={() => detect("cuts.split", (r) => `Split into ${plural(r.shots, "shot")}`)}
+        />
+        <ActionButton
+          label="Adjustment layer per cut"
+          avail={clip}
+          onClick={() => detect("cuts.adjustmentPerCut", (r) => `Added ${plural(r.shots, "adjustment layer")}`)}
+        />
+      </div>
+      <Hint>Uses After Effects' own scene edit detection. Detect cuts adds a layer marker at each cut.</Hint>
+    </Section>
   );
 }

@@ -55,17 +55,3 @@ export function Transitions() {
     />
   );
 }
-
-export function Ease() {
-  return (
-    <Planned
-      phase={2}
-      note="Shape keyframe timing on a visual curve instead of the Graph Editor."
-      items={[
-        "Cubic-bezier graph with two handles and a live motion preview",
-        "Read selected / Apply ease across all selected properties",
-        "Saved custom curves",
-      ]}
-    />
-  );
-}

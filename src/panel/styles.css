@@ -609,3 +609,134 @@ select {
   border-top: 1px dashed var(--border);
   background: var(--surface);
 }
+
+/* --- Ease editor --- */
+.ease-graph {
+  display: block;
+  width: 100%;
+  max-width: 260px;
+  margin: 0 auto;
+  touch-action: none;
+  user-select: none;
+}
+
+.ease-frame {
+  fill: var(--surface);
+  stroke: var(--border);
+}
+
+.ease-diagonal {
+  stroke: var(--border);
+  stroke-dasharray: 3 3;
+}
+
+.ease-arm {
+  stroke: var(--text-muted);
+  stroke-width: 1.2;
+}
+
+.ease-curve {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.5;
+}
+
+.ease-handle {
+  fill: var(--bg);
+  stroke: var(--accent);
+  stroke-width: 2;
+  cursor: grab;
+}
+
+.ease-handle:hover {
+  fill: var(--accent);
+}
+
+.ease-preview {
+  position: relative;
+  height: 14px;
+  max-width: 260px;
+  margin: 10px auto 6px;
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+
+.ease-dot {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: ease-move 1.4s infinite alternate;
+}
+
+@keyframes ease-move {
+  from {
+    left: 2px;
+  }
+  to {
+    left: calc(100% - 12px);
+  }
+}
+
+.ease-values {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  max-width: 260px;
+  margin: 0 auto;
+}
+
+.ease-values code {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.inline-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.chip-btn,
+.chip-x {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+
+.chip-x {
+  margin-left: 2px;
+  color: var(--text-muted);
+}
+
+.chip-x:hover {
+  color: var(--danger);
+}
+
+.save-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.save-row .search {
+  margin: 0;
+}
+
+.action.compact {
+  min-height: 0;
+  padding: 5px 10px;
+}

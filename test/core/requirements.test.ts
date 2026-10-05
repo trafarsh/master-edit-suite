@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { HostState, LayerInfo } from "../../src/panel/bridge/types";
-import { needsComp, needsLayers, rules } from "../../src/panel/core/requirements";
+import { needsComp, needsLayers, needsSceneClip, rules } from "../../src/panel/core/requirements";
 
 function layer(kind: LayerInfo["kind"], extra: Partial<LayerInfo> = {}): LayerInfo {
   return {
@@ -17,6 +17,7 @@ function state(selection: LayerInfo[], comp = true): HostState {
       ? { id: 1, name: "Main", width: 1920, height: 1080, pixelAspect: 1, frameRate: 30, frameDuration: 1 / 30, duration: 10, time: 0, displayStartTime: 0, numLayers: 3 }
       : null,
     selection,
+    keys: { properties: 0, pairs: 0 },
   };
 }
 
@@ -48,5 +49,11 @@ describe("selection awareness", () => {
 
   it("is disabled while the host has not answered yet", () => {
     expect(needsLayers(null).enabled).toBe(false);
+  });
+
+  it("cuts need exactly one footage clip without time remapping", () => {
+    expect(needsSceneClip(state([layer("footage"), layer("footage")])).reason).toBe("Select only one footage clip");
+    expect(needsSceneClip(state([layer("footage", { timeRemap: true })])).reason).toContain("time remapping");
+    expect(needsSceneClip(state([layer("footage", { name: "a.mp4" })]))).toMatchObject({ enabled: true, target: "a.mp4" });
   });
 });

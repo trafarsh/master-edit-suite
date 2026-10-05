@@ -53,6 +53,8 @@ export interface HostState {
   project: { name: string; saved: boolean; numItems: number } | null;
   comp: CompInfo | null;
   selection: LayerInfo[];
+  /** Selected keyframe pairs on numeric properties (Ease). */
+  keys: { properties: number; pairs: number };
 }
 
 export interface HostError {
