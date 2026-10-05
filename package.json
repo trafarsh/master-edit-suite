@@ -1,6 +1,6 @@
 {
   "name": "master-edit-suite",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Dockable After Effects panel: one-click Auto Edit plus everyday editing tools (working title).",
   "type": "module",

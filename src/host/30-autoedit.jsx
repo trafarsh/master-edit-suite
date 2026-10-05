@@ -196,12 +196,12 @@
     function clipEffects(comp, clip, p, original, ctx) {
         var fd = comp.frameDuration;
         var frames = Math.round((clip.outPoint - clip.inPoint) / fd);
-        var short = frames < MIN_FRAMES;
+        var tooShort = frames < MIN_FRAMES;
         var did = { velocity: false, zoom: false, shake: false };
         var slider, motion, tile, scale, k, zoomEnd, blend;
 
         if (p.velocity && p.velocity.enabled) {
-            if (short) {
+            if (tooShort) {
                 ctx.warn(clip.name + ": shorter than " + MIN_FRAMES + " frames, no velocity.");
             } else if (original.still) {
                 ctx.warn(clip.name + ": still image, no velocity.");
@@ -231,7 +231,7 @@
 
         var wantZoom = p.zoom && p.zoom.enabled;
         var wantShake = p.shake && p.shake.enabled;
-        if (wantZoom && short) {
+        if (wantZoom && tooShort) {
             ctx.warn(clip.name + ": shorter than " + MIN_FRAMES + " frames, no zooms.");
             wantZoom = false;
         }

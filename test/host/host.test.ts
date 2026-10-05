@@ -8,7 +8,11 @@ const f = (n: number) => n / fps;
 
 describe("host bundle", () => {
   it("parses as ES3 so ExtendScript can run it", () => {
-    expect(() => parse(bundleHost(), { ecmaVersion: 3 })).not.toThrow();
+    expect(() => parse(bundleHost(), { ecmaVersion: 3, allowReserved: false })).not.toThrow();
+  });
+
+  it("rejects ES3 reserved words such as short as identifiers", () => {
+    expect(() => parse("var short = 1;", { ecmaVersion: 3, allowReserved: false })).toThrow(/reserved/);
   });
 
   it("answers ping with the registered actions", () => {
