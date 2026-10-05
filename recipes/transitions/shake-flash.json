@@ -1,0 +1,32 @@
+{
+  "id": "shake-flash",
+  "name": "Shake flash",
+  "lengthFrames": 12,
+  "notes": "Flash on the cut, then a shake that decays. Motion Tile with mirrored edges keeps borders out of frame.",
+  "layers": [
+    {
+      "type": "solid",
+      "name": "Flash",
+      "color": [1, 1, 1],
+      "blendMode": "ADD",
+      "transform": {
+        "ADBE Opacity": { "keys": [["c-2", 0, "linear"], [0.5, 80, "linear"], ["c+3", 0, "smooth"]], "rest": 0 }
+      }
+    },
+    {
+      "type": "adjustment",
+      "name": "Shake",
+      "effects": [
+        { "matchName": "ADBE Tile", "params": { "4": 300, "5": 300, "6": 1 } },
+        {
+          "matchName": "ADBE Geometry2",
+          "params": {
+            "2": { "expression": "var d = time - {center};\nd < 0 ? value : wiggle(24, 45 * {intensity} * Math.exp(-9 * d))" },
+            "10": 0,
+            "11": 180
+          }
+        }
+      ]
+    }
+  ]
+}

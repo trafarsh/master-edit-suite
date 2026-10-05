@@ -1,0 +1,30 @@
+{
+  "id": "glitch-shake",
+  "name": "Glitch plus shake",
+  "lengthFrames": 12,
+  "notes": "Glitch on the cut followed by a decaying shake.",
+  "layers": [
+    {
+      "type": "adjustment",
+      "name": "Glitch",
+      "effects": [
+        { "matchName": "ADBE Tile", "params": { "4": 300, "5": 300, "6": 1 } },
+        {
+          "matchName": "ADBE Geometry2",
+          "params": {
+            "2": { "expression": "posterizeTime(20);\nseedRandom(7, false);\nvar d = time - {center};\nvar jump = Math.abs(d) < 0.12 ? [random(-1, 1) * 70, random(-1, 1) * 10] : [0, 0];\nvar shake = d < 0 ? [0, 0] : wiggle(24, 40 * Math.exp(-9 * d)) - value;\nvalue + (jump + shake) * {intensity}" },
+            "10": 0,
+            "11": 180
+          }
+        },
+        {
+          "matchName": "ADBE Turbulent Displace",
+          "params": {
+            "2": { "keys": [["c-2", 0, "linear"], [0.5, 70, "linear"], ["c+3", 0, "linear"]], "rest": 0 },
+            "3": 30
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "id": "hyperlapse",
+  "name": "Hyperlapse",
+  "lengthFrames": 10,
+  "notes": "Fast push with a slight roll and zoom blur, like a hyperlapse jump.",
+  "layers": [
+    {
+      "type": "adjustment",
+      "name": "Hyperlapse",
+      "effects": [
+        { "matchName": "ADBE Tile", "params": { "4": 300, "5": 300, "6": 1 } },
+        {
+          "matchName": "ADBE Geometry2",
+          "params": {
+            "4": { "keys": [[0, 100, "smooth"], ["c-1", 145, "hold"], ["c", 80, "linear"], [1, 100, "smooth"]], "rest": 100 },
+            "8": { "keys": [[0, 0, "smooth"], ["c-1", 6, "hold"], ["c", -4, "linear"], [1, 0, "smooth"]], "rest": 0 },
+            "10": 0,
+            "11": 180
+          }
+        },
+        {
+          "matchName": "ADBE Radial Blur",
+          "params": {
+            "1": { "keys": [[0, 0, "smooth"], [0.5, 25, "linear"], [1, 0, "smooth"]], "rest": 0 },
+            "3": 2
+          }
+        }
+      ]
+    }
+  ]
+}

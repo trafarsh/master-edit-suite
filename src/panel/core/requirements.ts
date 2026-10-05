@@ -83,4 +83,5 @@ export const rules = {
   text: { kinds: ["text"], noun: "text layer" } satisfies LayerRule,
   audio: { where: (l: LayerInfo) => l.hasAudio, noun: "audio layer" } satisfies LayerRule,
   visual: { kinds: VISUAL_KINDS, noun: "visual layer" } satisfies LayerRule,
+  clips: { kinds: CLIP_KINDS, noun: "clip" } satisfies LayerRule,
 };

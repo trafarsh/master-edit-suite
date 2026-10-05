@@ -1,7 +1,7 @@
 /** General: one-click fixes for arranging layers, audio, colour and cuts. */
 import { useState } from "react";
 import { useStore } from "../app/store";
-import { ActionButton, Hint, NumberField, Planned, Section, Tabs } from "../components/ui";
+import { ActionButton, Hint, NumberField, Planned, Section, Switch, Tabs } from "../components/ui";
 import { plural } from "../core/format";
 import { needsComp, needsLayers, needsSceneClip, rules, type Availability } from "../core/requirements";
 
@@ -23,15 +23,7 @@ export function General() {
       />
       {tab === "arrange" && <Arrange />}
       {tab === "audio" && <Audio />}
-      {tab === "color" && (
-        <Planned
-          phase={2}
-          items={[
-            "Balance brightness: even out exposure between selected clips with one Exposure effect each",
-            "Brightness target (1 to 10), strength (0 to 100%), \"Also tame over-bright clips\"",
-          ]}
-        />
-      )}
+      {tab === "color" && <Color />}
       {tab === "cuts" && <Cuts />}
     </>
   );
@@ -212,6 +204,66 @@ function Cuts() {
         />
       </div>
       <Hint>Uses After Effects' own scene edit detection. Detect cuts adds a layer marker at each cut.</Hint>
+    </Section>
+  );
+}
+
+function Color() {
+  const { state, run, settings, updateSettings, setProgress } = useStore();
+  const clips = needsLayers(state, rules.clips);
+  return (
+    <Section title="Balance brightness">
+      <NumberField
+        label="Brightness target"
+        suffix="1–10"
+        min={1}
+        max={10}
+        step={0.5}
+        value={settings.balanceTarget}
+        onChange={(v) => updateSettings({ balanceTarget: v })}
+      />
+      <label className="field">
+        <span className="field-label">Strength</span>
+        <span className="field-input">
+          <input
+            type="range"
+            min={0}
+            max={100}
+            step={5}
+            value={Math.round(settings.balanceStrength * 100)}
+            onChange={(e) => updateSettings({ balanceStrength: Number(e.target.value) / 100 })}
+          />
+          <span className="suffix range-value">{Math.round(settings.balanceStrength * 100)}%</span>
+        </span>
+      </label>
+      <label className="option">
+        <Switch label="Also tame over-bright clips" checked={settings.balanceTame} onChange={(v) => updateSettings({ balanceTame: v })} />
+        <span>Also tame over-bright clips</span>
+      </label>
+      <ActionButton
+        label={clips.enabled ? `Balance brightness · ${clips.target}` : "Balance brightness"}
+        primary
+        avail={{ ...clips, target: clips.enabled ? "One Exposure effect per clip" : "" }}
+        onClick={async () => {
+          setProgress({ title: `Measuring ${clips.target}…`, fraction: null });
+          try {
+            await run(
+              "color.balance",
+              { target: settings.balanceTarget, strength: settings.balanceStrength, tameBright: settings.balanceTame },
+              {
+                success: (r) =>
+                  `Balanced ${plural(r.clips, "clip")}: ${r.results.map((x: { stops: number }) => `${x.stops > 0 ? "+" : ""}${x.stops}`).join(", ")} stops`,
+              },
+            );
+          } finally {
+            setProgress(null);
+          }
+        }}
+      />
+      <Hint>
+        With the option off, clips are only brightened, never darkened. Running it again replaces the earlier balance instead of
+        stacking.
+      </Hint>
     </Section>
   );
 }

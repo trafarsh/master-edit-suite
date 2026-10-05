@@ -1,0 +1,28 @@
+{
+  "id": "glitch",
+  "name": "Glitch",
+  "lengthFrames": 8,
+  "notes": "Stepped horizontal jumps and turbulent displacement around the cut.",
+  "layers": [
+    {
+      "type": "adjustment",
+      "name": "Glitch",
+      "effects": [
+        { "matchName": "ADBE Tile", "params": { "4": 300, "5": 300, "6": 1 } },
+        {
+          "matchName": "ADBE Geometry2",
+          "params": {
+            "2": { "expression": "posterizeTime(20);\nseedRandom(7, false);\nvalue + [random(-1, 1) * 70 * {intensity}, random(-1, 1) * 10 * {intensity}]" }
+          }
+        },
+        {
+          "matchName": "ADBE Turbulent Displace",
+          "params": {
+            "2": { "keys": [[0, 0, "linear"], [0.5, 80, "linear"], [1, 0, "linear"]], "rest": 0 },
+            "3": 30
+          }
+        }
+      ]
+    }
+  ]
+}

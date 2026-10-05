@@ -35,6 +35,7 @@ interface Key {
 
 export class Property {
   keys: Key[] = [];
+  parentGroup: PropertyGroup | null = null;
   expression = "";
   expressionEnabled = false;
   dimensionsSeparated = false;
@@ -134,8 +135,10 @@ export class PropertyGroup {
     if (typeof key === "number") return this.props[key - 1] ?? null;
     return this.props.find((p) => p.matchName === key || p.name === key) ?? null;
   }
+  /** The layer this group belongs to (set on a layer's root groups). */
+  owner: Layer | null = null;
   add<T extends Property | PropertyGroup>(p: T): T {
-    if (p instanceof PropertyGroup) p.parentGroup = this;
+    p.parentGroup = this;
     this.props.push(p);
     return p;
   }
@@ -155,8 +158,30 @@ const EFFECT_NAMES: Record<string, string> = {
   "ADBE Geometry2": "Transform",
 };
 
+/** Parameter list (name, default) for the effects tests touch, in Effect Controls order. */
+const EFFECT_PARAMS: Record<string, [string, Value][]> = {
+  "ADBE Tile": [["Tile Center", [960, 540]], ["Tile Width", 100], ["Tile Height", 100], ["Output Width", 100], ["Output Height", 100], ["Mirror Edges", 0], ["Phase", 0], ["Horizontal Phase Shift", 0]],
+  "ADBE Geometry2": [["Anchor Point", [960, 540]], ["Position", [960, 540]], ["Uniform Scale", 1], ["Scale Height", 100], ["Scale Width", 100], ["Skew", 0], ["Skew Axis", 0], ["Rotation", 0], ["Opacity", 100], ["Use Composition's Shutter Angle", 1], ["Shutter Angle", 0], ["Sampling", 1]],
+  "ADBE Radial Blur": [["Amount", 10], ["Center", [960, 540]], ["Type", 1], ["Antialiasing", 1]],
+  "ADBE Gaussian Blur 2": [["Blurriness", 0], ["Blur Dimensions", 1], ["Repeat Edge Pixels", 0]],
+  "ADBE Color Control": [["Color", [1, 1, 1, 1]]],
+  "ADBE Slider Control": [["Slider", 0]],
+  "ADBE Exposure2": [["Channels", 1], ["Master", 0], ["Exposure", 0], ["Offset", 0], ["Gamma Correction", 1]],
+};
+
 export class Effect extends PropertyGroup {
   enabled = true;
+  moveTo(index: number) {
+    const g = this.parentGroup!;
+    g.props.splice(g.props.indexOf(this), 1);
+    g.props.splice(index - 1, 0, this);
+  }
+  constructor(matchName: string, name = matchName) {
+    super(matchName, name);
+    (EFFECT_PARAMS[matchName] ?? []).forEach(([n, v], i) =>
+      this.add(new Property(`${matchName}-${String(i + 1).padStart(4, "0")}`, Array.isArray(v) ? [...v] : v, n)),
+    );
+  }
   remove() {
     const g = this.parentGroup!;
     g.props.splice(g.props.indexOf(this), 1);
@@ -254,7 +279,7 @@ export class Layer {
     tr.add(new Property("ADBE Scale", [100, 100]));
     tr.add(new Property("ADBE Rotate Z", 0));
     tr.add(new Property("ADBE Opacity", 100));
-    this.root.add(new PropertyGroup("ADBE Effect Parade", "Effects"));
+    this.root.add(new PropertyGroup("ADBE Effect Parade", "Effects")).owner = this;
     this.root.add(new PropertyGroup("ADBE Marker", "Marker"));
   }
   get index() {

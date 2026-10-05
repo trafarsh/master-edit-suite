@@ -1,0 +1,17 @@
+{
+  "id": "flash",
+  "name": "Flash",
+  "lengthFrames": 6,
+  "notes": "White solid in Add mode; opacity peaks on the cut.",
+  "layers": [
+    {
+      "type": "solid",
+      "name": "Flash",
+      "color": [1, 1, 1],
+      "blendMode": "ADD",
+      "transform": {
+        "ADBE Opacity": { "keys": [[0, 0, "linear"], [0.5, 85, "linear"], [1, 0, "smooth"]], "rest": 0 }
+      }
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "id": "warp-flash",
+  "name": "Warp flash",
+  "lengthFrames": 10,
+  "notes": "Twirl and scale pulse peaking on the cut, with a flash.",
+  "layers": [
+    {
+      "type": "solid",
+      "name": "Flash",
+      "color": [1, 1, 1],
+      "blendMode": "ADD",
+      "transform": {
+        "ADBE Opacity": { "keys": [["c-2", 0, "linear"], [0.5, 70, "linear"], ["c+3", 0, "smooth"]], "rest": 0 }
+      }
+    },
+    {
+      "type": "adjustment",
+      "name": "Warp",
+      "effects": [
+        { "matchName": "ADBE Tile", "params": { "4": 300, "5": 300, "6": 1 } },
+        {
+          "matchName": "ADBE Twirl",
+          "params": {
+            "1": { "keys": [[0, 0, "smooth"], [0.5, 120, "linear"], [1, 0, "smooth"]], "rest": 0 },
+            "2": 60
+          }
+        },
+        {
+          "matchName": "ADBE Geometry2",
+          "params": {
+            "4": { "keys": [[0, 100, "smooth"], [0.5, 125, "linear"], [1, 100, "smooth"]], "rest": 100 }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -26,17 +26,3 @@ export function AiTools() {
     />
   );
 }
-
-export function Transitions() {
-  return (
-    <Planned
-      phase={2}
-      note="Park the playhead on a cut and add a finished transition in one click."
-      items={[
-        "Shake flash, Zoom into edit, Smooth parallel, Warp flash, Hyperlapse, Glitch plus shake, Glitch",
-        "Adjustment layers with built-in effects only, centred on the playhead",
-        "Recipe files, so new bundles need no code change",
-      ]}
-    />
-  );
-}

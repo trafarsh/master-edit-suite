@@ -4,9 +4,10 @@ import { Ease } from "./Ease";
 import { Fx } from "./Fx";
 import { General } from "./General";
 import { Library } from "./Library";
-import { AiTools, AutoEdit, Transitions } from "./planned";
+import { AiTools, AutoEdit } from "./planned";
 import { Project } from "./Project";
 import { SettingsModule } from "./SettingsModule";
+import { Transitions } from "./Transitions";
 
 export interface ModuleDef {
   id: string;

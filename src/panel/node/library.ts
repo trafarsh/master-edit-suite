@@ -1,5 +1,6 @@
 /** Node side of the Library: scans the library folder and reads/writes manifest.json. */
 import { isManifest, scanLibrary, type Manifest, type ScanFs } from "../core/library";
+import { validateRecipe, type Recipe } from "../core/recipes";
 import { logger } from "./logger";
 import { node, type NodeApi } from "./node";
 
@@ -56,4 +57,25 @@ export function loadLibrary(root: string): Manifest {
 export function fileUrl(path: string): string {
   const p = path.replace(/\\/g, "/");
   return encodeURI(`file://${p.startsWith("/") ? "" : "/"}${p}`).replace(/#/g, "%23").replace(/\?/g, "%3F");
+}
+
+/** Personal transition recipes from <library>/transitions/*.json; invalid ones are logged and skipped. */
+export function loadLibraryRecipes(root: string): Recipe[] {
+  const n = node();
+  if (!n || !root) return [];
+  const dir = n.path.join(root, "transitions");
+  if (!n.fs.existsSync(dir)) return [];
+  const out: Recipe[] = [];
+  for (const f of n.fs.readdirSync(dir).filter((x) => x.toLowerCase().endsWith(".json"))) {
+    const file = n.path.join(dir, f);
+    try {
+      const r = JSON.parse(n.fs.readFileSync(file, "utf8"));
+      const errors = validateRecipe(r);
+      if (errors.length) logger.warn(`Recipe ${f} skipped`, { errors });
+      else out.push({ ...r, source: file });
+    } catch (e) {
+      logger.warn(`Recipe ${f} could not be read`, { error: String(e) });
+    }
+  }
+  return out;
 }

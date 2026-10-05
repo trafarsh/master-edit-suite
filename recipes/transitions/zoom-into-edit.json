@@ -1,0 +1,30 @@
+{
+  "id": "zoom-into-edit",
+  "name": "Zoom into edit",
+  "lengthFrames": 12,
+  "notes": "Outgoing shot accelerates into a zoom, the incoming shot lands zoomed out and settles. Radial zoom blur at the cut.",
+  "layers": [
+    {
+      "type": "adjustment",
+      "name": "Zoom",
+      "effects": [
+        { "matchName": "ADBE Tile", "params": { "4": 300, "5": 300, "6": 1 } },
+        {
+          "matchName": "ADBE Geometry2",
+          "params": {
+            "4": { "keys": [[0, 100, "smooth"], ["c-1", 210, "hold"], ["c", 55, "linear"], [1, 100, "smooth"]], "rest": 100 },
+            "10": 0,
+            "11": 180
+          }
+        },
+        {
+          "matchName": "ADBE Radial Blur",
+          "params": {
+            "1": { "keys": [[0, 0, "smooth"], [0.5, 40, "linear"], [1, 0, "smooth"]], "rest": 0 },
+            "3": 2
+          }
+        }
+      ]
+    }
+  ]
+}

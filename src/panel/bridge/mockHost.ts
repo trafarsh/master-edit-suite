@@ -117,6 +117,7 @@ const UNDO: Record<string, string> = {
   "cuts.adjustmentPerCut": "Adjustment Layer per Cut",
   "ease.apply": "Apply Ease",
   "library.applyPreset": "Apply Preset",
+  "color.balance": "Balance Brightness",
   "library.insertSound": "Insert Sound Effect",
   "library.insertTexture": "Insert Texture",
 };
@@ -153,6 +154,8 @@ export async function mockCall(action: string, args: unknown): Promise<string> {
     }
     case "fx.selectLayers":
       return ok({ selected: 2 });
+    case "transitions.apply":
+      return ok({ layers: 1, center: comp.time }, `Transition: ${(a.recipe as { name?: string })?.name ?? ""}`);
     case "host.findEffects":
       return ok({ matchNames: [] });
     case "library.insertSound":
@@ -187,6 +190,7 @@ export async function mockCall(action: string, args: unknown): Promise<string> {
         "cuts.adjustmentPerCut": { shots: 4, cuts: 3 },
         "ease.apply": { pairs: 2, properties: 1 },
         "library.applyPreset": { layers: n },
+        "color.balance": { clips: n, results: sel.map((l, i) => ({ name: l.name, luma: 0.3, stops: [0.4, 0, 1.1, -0.3, 0.6, 0.2][i % 6] })) },
         "ease.read": { curve: [0.7, 0, 0.2, 1], property: "Scale" },
       };
       if (!(action in results)) return fail(`Unknown host action: ${action}`, "unknown_action");

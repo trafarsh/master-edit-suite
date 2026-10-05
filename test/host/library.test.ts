@@ -73,7 +73,7 @@ describe("library host actions", () => {
     // The preset adds a Gaussian Blur animated from the playhead to playhead + 1 s.
     (AVLayer.prototype as any).applyPreset = function (this: AVLayer) {
       const fx = (this.property("ADBE Effect Parade") as any).addProperty("ADBE Gaussian Blur 2") as Effect;
-      const blur = fx.add(new Property("ADBE Gaussian Blur 2-0001", 0, "Blurriness"));
+      const blur = fx.property(1) as Property; // Blurriness
       blur.setValueAtTime(this.comp.time, 40);
       blur.setValueAtTime(this.comp.time + 1, 0);
     };

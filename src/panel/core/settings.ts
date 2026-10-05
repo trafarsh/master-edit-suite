@@ -32,6 +32,14 @@ export interface Settings {
   presetStretch: boolean;
   presetAtLayerStart: boolean;
   textureBlend: TextureBlend;
+  /** Transition length override in frames; 0 = each recipe's own length. */
+  transitionFrames: number;
+  /** 0.25..2, scales how far keyframes move from rest. */
+  transitionIntensity: number;
+  /** Balance brightness: target 1..10, strength 0..1, darken over-bright clips too. */
+  balanceTarget: number;
+  balanceStrength: number;
+  balanceTame: boolean;
   lastModule: string;
   easePresets: EaseCurve[];
 }
@@ -53,6 +61,11 @@ export const DEFAULT_SETTINGS: Settings = {
   presetStretch: false,
   presetAtLayerStart: false,
   textureBlend: "SCREEN",
+  transitionFrames: 0,
+  transitionIntensity: 1,
+  balanceTarget: 5,
+  balanceStrength: 0.8,
+  balanceTame: false,
   lastModule: "general",
   easePresets: [],
 };
@@ -66,6 +79,10 @@ export const NUMBER_LIMITS: Record<Exclude<NumberKey, "version">, [number, numbe
   volumeStepDb: [0.1, 24],
   staircaseOverlapFrames: [0, 600],
   pollMs: [250, 10000],
+  transitionFrames: [0, 240],
+  transitionIntensity: [0.25, 2],
+  balanceTarget: [1, 10],
+  balanceStrength: [0, 1],
 };
 
 function clamp(n: number, [lo, hi]: [number, number]) {
@@ -91,9 +108,11 @@ export function normalizeSettings(raw: unknown): Settings {
   }
   out.mp4Crf = Math.round(out.mp4Crf);
   out.staircaseOverlapFrames = Math.round(out.staircaseOverlapFrames);
+  out.transitionFrames = Math.round(out.transitionFrames);
   if (r.resizeMode === "fit" || r.resizeMode === "fill") out.resizeMode = r.resizeMode;
   if (r.fxScope === "comp" || r.fxScope === "selected") out.fxScope = r.fxScope;
   if (typeof r.presetStretch === "boolean") out.presetStretch = r.presetStretch;
+  if (typeof r.balanceTame === "boolean") out.balanceTame = r.balanceTame;
   if (typeof r.presetAtLayerStart === "boolean") out.presetAtLayerStart = r.presetAtLayerStart;
   if (TEXTURE_BLENDS.includes(r.textureBlend as TextureBlend)) out.textureBlend = r.textureBlend as TextureBlend;
   if (Array.isArray(r.easePresets)) {

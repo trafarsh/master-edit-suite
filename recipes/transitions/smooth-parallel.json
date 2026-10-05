@@ -1,0 +1,28 @@
+{
+  "id": "smooth-parallel",
+  "name": "Smooth parallel",
+  "lengthFrames": 14,
+  "notes": "Horizontal slide of two frame widths, fastest on the cut, with motion blur. Mirrored tiles keep the frame filled.",
+  "layers": [
+    {
+      "type": "adjustment",
+      "name": "Slide",
+      "effects": [
+        { "matchName": "ADBE Tile", "params": { "4": 500, "5": 100, "6": 1 } },
+        {
+          "matchName": "ADBE Geometry2",
+          "params": {
+            "2": {
+              "keys": [
+                [0, ["{width}/2", "{height}/2"], "smooth"],
+                [1, ["{width}/2 - 2*{width}", "{height}/2"], "smooth"]
+              ]
+            },
+            "10": 0,
+            "11": 270
+          }
+        }
+      ]
+    }
+  ]
+}
