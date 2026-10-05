@@ -61,6 +61,20 @@ export class Property {
     this.keys[i - 1].inEase = inEase;
     this.keys[i - 1].outEase = outEase ?? inEase;
   }
+  addKey(t: number) {
+    this.setValueAtTime(t, this.valueAtTime(t));
+    return this.keys.findIndex((k) => Math.abs(k.time - t) < EPS) + 1;
+  }
+  removeKey(i: number) {
+    this.keys.splice(i - 1, 1);
+  }
+  keyInSpatialTangent() {
+    return [0, 0];
+  }
+  keyOutSpatialTangent() {
+    return [0, 0];
+  }
+  setSpatialTangentsAtKey() {}
   keyInInterpolationType(i: number) {
     return this.keys[i - 1].inType ?? KeyframeInterpolationType.LINEAR;
   }
@@ -185,7 +199,17 @@ export class FileSource {
   constructor(public isStill = false) {}
 }
 
+export class MockFile {
+  constructor(public fsName: string) {}
+  get exists() {
+    return !fsName_missing.has(this.fsName);
+  }
+}
+/** Paths that tests mark as missing on disk. */
+export const fsName_missing = new Set<string>();
+
 export class FootageItem extends Item {
+  file: MockFile | null = null;
   constructor(
     name: string,
     public mainSource: SolidSource | FileSource,
@@ -219,6 +243,7 @@ export class Layer {
   timeRemapEnabled = false;
   threeDLayer = false;
   source: Item | null = null;
+  blendingMode = 0;
   root = new PropertyGroup("root");
   constructor(public name: string) {
     const tr = this.root.add(new PropertyGroup("ADBE Transform Group", "Transform"));
@@ -264,6 +289,9 @@ export class Layer {
   }
   property(key: number | string) {
     return this.root.property(key);
+  }
+  get numProperties() {
+    return this.root.numProperties;
   }
   remove() {
     this.comp.layerList.splice(this.comp.layerList.indexOf(this), 1);
@@ -322,6 +350,14 @@ export class CompItem extends Item {
         l.nullLayer = true;
         return l;
       },
+      add: (item: FootageItem | CompItem) => {
+        const footage = item as FootageItem;
+        return this.addLayer(new AVLayer(item.name), 0, this.duration, {
+          source: item,
+          hasAudio: footage.hasAudio ?? false,
+          hasVideo: footage.hasVideo ?? true,
+        });
+      },
       addSolid: (_color: number[], name: string, width: number, height: number, _pa: number, duration = this.duration) => {
         const solid = project.addItem(new FootageItem(name, new SolidSource(), true, false, width, height));
         return this.addLayer(new AVLayer(name), 0, duration, { source: solid });
@@ -370,6 +406,16 @@ export class Project {
     item.parentFolder = this.rootFolder;
     return item;
   }
+  imports = 0;
+  importFile(opts: { file: MockFile }) {
+    this.imports++;
+    const name = opts.file.fsName.split(/[\\/]/).pop()!;
+    const audio = /\.(wav|mp3|aif|aiff|m4a)$/i.test(name);
+    const still = /\.(png|jpe?g|tiff?|psd)$/i.test(name);
+    const item = this.addItem(new FootageItem(name, new FileSource(still), !audio, audio, 1000, 500));
+    item.file = opts.file;
+    return item;
+  }
 }
 
 let project = new Project();
@@ -388,8 +434,13 @@ export function createHost() {
   project = new Project();
   const undoLog: string[] = [];
   let openGroups = 0;
+  fsName_missing.clear();
   const app = {
     project,
+    effects: [
+      { displayName: "Gaussian Blur", matchName: "ADBE Gaussian Blur 2" },
+      { displayName: "Exposure", matchName: "ADBE Exposure2" },
+    ],
     version: "24.0x0",
     buildName: "mock",
     isoLanguage: "en_US",
@@ -421,6 +472,11 @@ export function createHost() {
     ParagraphJustification: { LEFT_JUSTIFY: 1 },
     RQItemStatus: { QUEUED: 1 },
     SceneEditDetectionMode: { MARKERS: 1, SPLIT: 2, SPLIT_PRECOMP: 3, NONE: 4 },
+    BlendingMode: { NORMAL: 1, SCREEN: 2, OVERLAY: 3, ADD: 4 },
+    File: MockFile,
+    ImportOptions: class {
+      constructor(public file: MockFile) {}
+    },
     Property,
     KeyframeEase,
     KeyframeInterpolationType,

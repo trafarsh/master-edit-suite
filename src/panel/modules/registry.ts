@@ -3,7 +3,8 @@ import type { IconName } from "../components/Icons";
 import { Ease } from "./Ease";
 import { Fx } from "./Fx";
 import { General } from "./General";
-import { AiTools, AutoEdit, Library, Transitions } from "./planned";
+import { Library } from "./Library";
+import { AiTools, AutoEdit, Transitions } from "./planned";
 import { Project } from "./Project";
 import { SettingsModule } from "./SettingsModule";
 

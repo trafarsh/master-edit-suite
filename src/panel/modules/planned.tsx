@@ -17,21 +17,6 @@ export function AutoEdit() {
   );
 }
 
-export function Library() {
-  return (
-    <Planned
-      phase={2}
-      note="One searchable place for your presets, sound effects and textures."
-      items={[
-        "Presets (.ffx) with hover previews, applied to every selected layer",
-        "Sound effects: preview in the panel, insert at the playhead",
-        "Textures inserted fitted to the comp with a blending mode",
-        "Folder scan builds manifest.json with a licence source for every item",
-      ]}
-    />
-  );
-}
-
 export function AiTools() {
   return (
     <Planned

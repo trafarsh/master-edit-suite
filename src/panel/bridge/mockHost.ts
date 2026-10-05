@@ -4,6 +4,7 @@
  * never pretends to edit anything. Not bundled into behaviour inside AE: callHost
  * only reaches it when window.__adobe_cep__ is missing.
  */
+import type { LibraryItem, LibraryTab, Manifest } from "../core/library";
 import type { CompInfo, FxGroup, HostState, LayerInfo, LayerKind, PingResult } from "./types";
 
 const comp: CompInfo = {
@@ -115,6 +116,9 @@ const UNDO: Record<string, string> = {
   "cuts.split": "Split at Cuts",
   "cuts.adjustmentPerCut": "Adjustment Layer per Cut",
   "ease.apply": "Apply Ease",
+  "library.applyPreset": "Apply Preset",
+  "library.insertSound": "Insert Sound Effect",
+  "library.insertTexture": "Insert Texture",
 };
 
 export async function mockCall(action: string, args: unknown): Promise<string> {
@@ -149,6 +153,12 @@ export async function mockCall(action: string, args: unknown): Promise<string> {
     }
     case "fx.selectLayers":
       return ok({ selected: 2 });
+    case "host.findEffects":
+      return ok({ matchNames: [] });
+    case "library.insertSound":
+      return ok({ name: "whoosh.wav", time: comp.time }, UNDO[action]);
+    case "library.insertTexture":
+      return ok({ name: "dust.png" }, UNDO[action]);
     case "project.render":
       return fail("Rendering needs After Effects; the browser mock cannot render.", "mock");
     case "project.saveFramePng":
@@ -176,6 +186,7 @@ export async function mockCall(action: string, args: unknown): Promise<string> {
         "cuts.split": { shots: 4 },
         "cuts.adjustmentPerCut": { shots: 4, cuts: 3 },
         "ease.apply": { pairs: 2, properties: 1 },
+        "library.applyPreset": { layers: n },
         "ease.read": { curve: [0.7, 0, 0.2, 1], property: "Scale" },
       };
       if (!(action in results)) return fail(`Unknown host action: ${action}`, "unknown_action");
@@ -183,4 +194,39 @@ export async function mockCall(action: string, args: unknown): Promise<string> {
       return ok(results[action], UNDO[action]);
     }
   }
+}
+
+/** Sample library for the browser preview (the real one is scanned from disk). */
+export function mockManifest(): Manifest {
+  const item = (tab: LibraryTab, category: string, name: string, extra: Partial<LibraryItem> = {}): LibraryItem => ({
+    id: `${tab}/${category}/${name}`,
+    tab,
+    category,
+    name,
+    file: `/library/${tab}/${category}/${name}`,
+    preview: null,
+    tags: [],
+    licence: "Own work",
+    needsTwixtor: false,
+    ...extra,
+  });
+  return {
+    version: 1,
+    scannedAt: new Date().toISOString(),
+    root: "/library",
+    items: [
+      item("presets", "Zooms", "Punch in"),
+      item("presets", "Zooms", "Slow push"),
+      item("presets", "Shakes", "Hard shake"),
+      item("presets", "Shakes", "Handheld"),
+      item("presets", "Twixtors", "Smooth slowmo", { needsTwixtor: true, licence: null }),
+      item("presets", "Text", "Pop in"),
+      item("sounds", "Whooshes", "Whoosh fast 1"),
+      item("sounds", "Whooshes", "Whoosh deep"),
+      item("sounds", "Hits and punches", "Punch heavy"),
+      item("sounds", "Camera", "Shutter"),
+      item("textures", "Dust", "Dust overlay"),
+      item("textures", "Light leaks", "Leak warm"),
+    ],
+  };
 }

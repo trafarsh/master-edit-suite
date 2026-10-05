@@ -6,6 +6,9 @@ export interface EaseCurve {
   points: [number, number, number, number];
 }
 
+export const TEXTURE_BLENDS = ["SCREEN", "ADD", "OVERLAY", "SOFT_LIGHT", "MULTIPLY", "NORMAL"] as const;
+export type TextureBlend = (typeof TEXTURE_BLENDS)[number];
+
 export interface Settings {
   version: 1;
   /** Root of library/<tab>/<category>/<item>. Empty = not set yet. */
@@ -26,6 +29,9 @@ export interface Settings {
   pollMs: number;
   resizeMode: "fit" | "fill";
   fxScope: "comp" | "selected";
+  presetStretch: boolean;
+  presetAtLayerStart: boolean;
+  textureBlend: TextureBlend;
   lastModule: string;
   easePresets: EaseCurve[];
 }
@@ -44,6 +50,9 @@ export const DEFAULT_SETTINGS: Settings = {
   pollMs: 1000,
   resizeMode: "fit",
   fxScope: "comp",
+  presetStretch: false,
+  presetAtLayerStart: false,
+  textureBlend: "SCREEN",
   lastModule: "general",
   easePresets: [],
 };
@@ -84,6 +93,9 @@ export function normalizeSettings(raw: unknown): Settings {
   out.staircaseOverlapFrames = Math.round(out.staircaseOverlapFrames);
   if (r.resizeMode === "fit" || r.resizeMode === "fill") out.resizeMode = r.resizeMode;
   if (r.fxScope === "comp" || r.fxScope === "selected") out.fxScope = r.fxScope;
+  if (typeof r.presetStretch === "boolean") out.presetStretch = r.presetStretch;
+  if (typeof r.presetAtLayerStart === "boolean") out.presetAtLayerStart = r.presetAtLayerStart;
+  if (TEXTURE_BLENDS.includes(r.textureBlend as TextureBlend)) out.textureBlend = r.textureBlend as TextureBlend;
   if (Array.isArray(r.easePresets)) {
     out.easePresets = r.easePresets.filter(
       (p): p is EaseCurve =>
