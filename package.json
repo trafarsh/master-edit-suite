@@ -15,7 +15,8 @@
     "check": "npm run typecheck && npm run test && npm run build",
     "link": "node scripts/link.mjs",
     "unlink": "node scripts/link.mjs --remove",
-    "debug-mode": "node scripts/debug-mode.mjs"
+    "debug-mode": "node scripts/debug-mode.mjs",
+    "installer": "npm run build && node scripts/build-installer.mjs"
   },
   "engines": {
     "node": ">=20"

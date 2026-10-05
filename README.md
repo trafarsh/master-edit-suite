@@ -45,6 +45,19 @@ adjusting there:
 - Node.js 20+ for building
 - ffmpeg with libx264 for Render and convert (see [`bin/README.md`](bin/README.md))
 
+## Install on Windows (installer)
+
+`npm run installer` builds `dist/MasterEditSuite-Setup-<version>.exe` with NSIS
+(`makensis` must be on the PATH). The installer needs no administrator rights: it
+copies the panel to `%APPDATA%\Adobe\CEP\extensions\com.mastereditsuite.panel`,
+turns on PlayerDebugMode for CSXS 11 and 12 so After Effects loads the unsigned
+panel, and adds an uninstaller to Windows' Installed apps. It asks you to close
+After Effects first. Uninstalling keeps your settings and logs.
+
+The installer is not code-signed, so Windows SmartScreen shows "Windows protected
+your PC" on first run: click **More info › Run anyway**. Signing is part of the
+"sell it later" open question.
+
 ## Install a development build
 
 ```bash
@@ -78,6 +91,7 @@ needs Node and is disabled in the browser.
 | `npm run typecheck` | TypeScript check of panel, Node layer and tests |
 | `npm run check` | Typecheck, tests and build: run before every commit |
 | `npm run link` / `npm run unlink` | Add or remove the extension link |
+| `npm run installer` | Build, then package the Windows installer `.exe` (needs NSIS) |
 
 ## Architecture
 
