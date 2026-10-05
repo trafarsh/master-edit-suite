@@ -1,0 +1,37 @@
+{
+  "name": "master-edit-suite",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Dockable After Effects panel: one-click Auto Edit plus everyday editing tools (working title).",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run build:panel && npm run build:host && node scripts/postbuild.mjs",
+    "build:panel": "vite build",
+    "build:host": "node scripts/build-host.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "npm run typecheck && npm run test && npm run build",
+    "link": "node scripts/link.mjs",
+    "unlink": "node scripts/link.mjs --remove",
+    "debug-mode": "node scripts/debug-mode.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^5.2.0",
+    "acorn": "^8.19.0",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.6",
+    "vitest": "^3.2.7"
+  }
+}

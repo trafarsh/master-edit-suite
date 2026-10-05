@@ -1,0 +1,71 @@
+/** Modules scheduled for later phases. Each lists exactly what the PRD commits to. */
+import { Planned } from "../components/ui";
+
+export function AutoEdit() {
+  return (
+    <Planned
+      phase={3}
+      note="Turns the selected clips into a styled edit part in one run, undone by one Ctrl+Z."
+      items={[
+        "Pre-compose each clip (reuses General › Arrange › Pre-compose each)",
+        "Effects per clip: velocity ramp, zooms, shake with mirrored edges",
+        "Transition into the edit, transitions at every clip switch",
+        "Additional effect over the edit part, then coloring (CC)",
+        "Styles as JSON files; re-runs replace earlier output",
+      ]}
+    />
+  );
+}
+
+export function Library() {
+  return (
+    <Planned
+      phase={2}
+      note="One searchable place for your presets, sound effects and textures."
+      items={[
+        "Presets (.ffx) with hover previews, applied to every selected layer",
+        "Sound effects: preview in the panel, insert at the playhead",
+        "Textures inserted fitted to the comp with a blending mode",
+        "Folder scan builds manifest.json with a licence source for every item",
+      ]}
+    />
+  );
+}
+
+export function AiTools() {
+  return (
+    <Planned
+      phase={4}
+      note="Run in the background and drop results straight into the timeline."
+      items={["Auto Captions (first)", "Dialogue isolation", "Sound effects generator", "Auto Tracker"]}
+    />
+  );
+}
+
+export function Transitions() {
+  return (
+    <Planned
+      phase={2}
+      note="Park the playhead on a cut and add a finished transition in one click."
+      items={[
+        "Shake flash, Zoom into edit, Smooth parallel, Warp flash, Hyperlapse, Glitch plus shake, Glitch",
+        "Adjustment layers with built-in effects only, centred on the playhead",
+        "Recipe files, so new bundles need no code change",
+      ]}
+    />
+  );
+}
+
+export function Ease() {
+  return (
+    <Planned
+      phase={2}
+      note="Shape keyframe timing on a visual curve instead of the Graph Editor."
+      items={[
+        "Cubic-bezier graph with two handles and a live motion preview",
+        "Read selected / Apply ease across all selected properties",
+        "Saved custom curves",
+      ]}
+    />
+  );
+}

@@ -1,0 +1,11 @@
+node_modules/
+dist/
+coverage/
+*.log
+.DS_Store
+Thumbs.db
+# ffmpeg binaries are placed locally, never committed
+bin/ffmpeg
+bin/ffmpeg.exe
+# local library assets live outside the repo
+library/
