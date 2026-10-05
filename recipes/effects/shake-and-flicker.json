@@ -1,0 +1,23 @@
+{
+  "id": "shake-and-flicker",
+  "name": "Shake and flicker",
+  "lengthFrames": 30,
+  "notes": "Auto Edit step 5: a light continuous shake and brightness flicker over the whole edit part.",
+  "layers": [
+    {
+      "type": "adjustment",
+      "name": "Shake and flicker",
+      "effects": [
+        { "matchName": "ADBE Tile", "params": { "4": 300, "5": 300, "6": 1 } },
+        {
+          "matchName": "ADBE Geometry2",
+          "params": { "2": { "expression": "wiggle(6, 8 * {intensity})" } }
+        },
+        {
+          "matchName": "ADBE Brightness & Contrast 2",
+          "params": { "1": { "expression": "posterizeTime(12);\nwiggle(12, 10 * {intensity})" } }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "id": "soft-glow",
+  "name": "Soft glow",
+  "lengthFrames": 30,
+  "notes": "Auto Edit step 6 grade: lifted, low contrast, warm highlights.",
+  "layers": [
+    {
+      "type": "adjustment",
+      "name": "Soft glow",
+      "effects": [
+        { "matchName": "ADBE Brightness & Contrast 2", "params": { "1": 6, "2": -8 } },
+        { "matchName": "ADBE Vibrance", "params": { "1": 10, "2": -5 } },
+        { "matchName": "ADBE Tint", "params": { "1": [0, 0, 0, 1], "2": [1, 0.94, 0.86, 1], "3": 10 } }
+      ]
+    }
+  ]
+}

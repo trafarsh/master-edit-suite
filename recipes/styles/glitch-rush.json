@@ -1,0 +1,13 @@
+{
+  "id": "glitch-rush",
+  "name": "Glitch Rush",
+  "description": "Strong ramps, shakes and glitch cuts with a soft glow grade.",
+  "steps": { "precompose": true, "effects": true, "transitionIn": true, "cuts": true, "extra": true, "cc": true },
+  "velocity": { "enabled": true, "strength": 0.75, "frameBlend": "pixelMotion" },
+  "zoom": { "enabled": true, "amount": 22, "duration": 6, "push": 6 },
+  "shake": { "enabled": true, "amplitude": 40, "frequency": 18, "decay": 5 },
+  "transitionIn": { "type": "zoom-into-edit", "strength": 1.2 },
+  "cuts": { "type": "glitch", "intensity": 1, "duration": 8 },
+  "extra": { "type": "shake-and-flicker", "intensity": 0.8 },
+  "cc": { "look": "soft-glow", "balance": false }
+}

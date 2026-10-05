@@ -1,0 +1,13 @@
+{
+  "id": "hard-filmstyle",
+  "name": "Hard Filmstyle",
+  "description": "Aggressive ramps and punch-ins, flash on every cut, hard film grade.",
+  "steps": { "precompose": true, "effects": true, "transitionIn": true, "cuts": true, "extra": true, "cc": true },
+  "velocity": { "enabled": true, "strength": 0.65, "frameBlend": "pixelMotion" },
+  "zoom": { "enabled": true, "amount": 18, "duration": 8, "push": 5 },
+  "shake": { "enabled": true, "amplitude": 30, "frequency": 14, "decay": 6 },
+  "transitionIn": { "type": "zoom-into-edit", "strength": 1 },
+  "cuts": { "type": "flash", "intensity": 0.85, "duration": 6 },
+  "extra": { "type": "shake-and-flicker", "intensity": 0.5 },
+  "cc": { "look": "hard-film", "balance": false }
+}

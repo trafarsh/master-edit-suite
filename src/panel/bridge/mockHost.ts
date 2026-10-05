@@ -156,6 +156,28 @@ export async function mockCall(action: string, args: unknown): Promise<string> {
       return ok({ selected: 2 });
     case "transitions.apply":
       return ok({ layers: 1, center: comp.time }, `Transition: ${(a.recipe as { name?: string })?.name ?? ""}`);
+    case "autoedit.inspect": {
+      const clips = sel.filter((l) => ["footage", "precomp", "still"].includes(l.kind)).sort((x, y) => x.inPoint - y.inPoint);
+      return ok({
+        ids: clips.map((l) => l.id),
+        names: clips.map((l) => l.name),
+        clips: clips.length,
+        start: clips[0]?.inPoint ?? 0,
+        end: clips.length ? Math.max(...clips.map((l) => l.outPoint)) : 0,
+        switches: clips.slice(1).map((l) => l.inPoint),
+        needPrecompose: clips.filter((l) => l.kind !== "precomp").length,
+        shortClips: [],
+        stills: [],
+        timeRemapped: [],
+        overlaps: [],
+        hasIntro: true,
+        notes: [],
+      });
+    }
+    case "autoedit.run": {
+      const ids = (a.clipIds as number[]) ?? [];
+      return ok({ clips: ids.length, cuts: Math.max(0, ids.length - 1), precomposed: ids.length }, "Auto Edit");
+    }
     case "host.findEffects":
       return ok({ matchNames: [] });
     case "library.insertSound":

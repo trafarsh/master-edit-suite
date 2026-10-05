@@ -131,7 +131,9 @@
 
     /**
      * Builds one recipe centred on `center` (seconds). Returns the created layers,
-     * top first. opts: lengthFrames, intensity, above (layer to sit above), tag.
+     * top first. opts: lengthFrames, intensity, above (layer to sit above), tag,
+     * prefix, label, span ([start, end] instead of a length around the centre),
+     * only ("adjustment" or "solid" to build just those layers of the recipe).
      */
     function build(comp, recipe, center, opts, ctx) {
         var fd = comp.frameDuration;
@@ -139,6 +141,11 @@
         var c = u.snap(comp, center);
         var start = c - Math.floor(frames / 2) * fd;
         var end = start + frames * fd;
+        if (opts.span) {
+            start = opts.span[0];
+            end = opts.span[1];
+            c = u.snap(comp, (start + end) / 2);
+        }
         var t = {
             intensity: opts.intensity === undefined ? 1 : opts.intensity,
             at: function (x) {
@@ -154,6 +161,7 @@
         };
         var made = [];
         var anchor = opts.above || null;
+        var outerStep = ctx.step;
         var i, j, spec, layer, tr, k, fxSpec, fx, p;
         t.vars = {
             start: start,
@@ -170,7 +178,10 @@
         }
         for (i = recipe.layers.length - 1; i >= 0; i--) {
             spec = recipe.layers[i];
-            ctx.setStep(recipe.name + " · " + (spec.name || spec.type));
+            if (opts.only && (spec.type === "solid" ? "solid" : "adjustment") !== opts.only) {
+                continue;
+            }
+            ctx.setStep((outerStep ? outerStep + " › " : "") + recipe.name + " · " + (spec.name || spec.type));
             layer = ctx.track(comp.layers.addSolid(spec.color || [1, 1, 1], (opts.prefix || "TR") + " · " + (spec.name || recipe.name), comp.width, comp.height, comp.pixelAspect, comp.duration));
             layer.adjustmentLayer = spec.type !== "solid";
             layer.startTime = 0;
@@ -206,6 +217,7 @@
             }
             made.unshift(layer);
         }
+        ctx.setStep(outerStep);
         return made;
     }
 

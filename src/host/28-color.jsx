@@ -84,41 +84,46 @@
         throw u.userError("Could not find the Exposure control in this After Effects version. Please send Copy diagnostics.", "exposure_param");
     }
 
-    M.color = { stopsFor: stopsFor, targetLuma: targetLuma };
+    /** Balances `layers`; returns one result per clip that was changed. Shared with Auto Edit. */
+    function balanceLayers(comp, layers, args, ctx) {
+        var target = targetLuma(args.target || 5);
+        var strength = clamp(args.strength === undefined ? 1 : args.strength, 0, 1);
+        var results = [];
+        var i, layer, kind, luma, stops, fx;
+        for (i = 0; i < layers.length; i++) {
+            layer = layers[i];
+            kind = u.layerKind(layer);
+            if (kind !== "footage" && kind !== "still" && kind !== "precomp") {
+                ctx.warn(layer.name + ": not a clip, skipped.");
+                continue;
+            }
+            if (layer.locked) {
+                ctx.warn(layer.name + ": locked, skipped.");
+                continue;
+            }
+            ctx.setStep("Measure " + layer.name);
+            luma = measure(comp, layer, ctx);
+            stops = stopsFor(luma, target, strength, !!args.tameBright);
+            ctx.setStep("Expose " + layer.name);
+            fx = findBalance(layer);
+            if (!fx) {
+                fx = u.addEffect(layer, "ADBE Exposure2", ctx);
+                fx.name = EFFECT_NAME;
+                fx.moveTo(1);
+            }
+            exposureControl(fx).setValue(Math.round(stops * 100) / 100);
+            results.push({ name: layer.name, luma: Math.round(luma * 1000) / 1000, stops: Math.round(stops * 100) / 100 });
+        }
+        return results;
+    }
+
+    M.color = { stopsFor: stopsFor, targetLuma: targetLuma, balanceLayers: balanceLayers };
 
     M.register("color.balance", {
         undo: "Balance Brightness",
         fn: function (args, ctx) {
             var comp = u.activeComp();
-            var layers = u.selectedLayers(comp, 1);
-            var target = targetLuma(args.target || 5);
-            var strength = clamp(args.strength === undefined ? 1 : args.strength, 0, 1);
-            var results = [];
-            var i, layer, kind, luma, stops, fx;
-            for (i = 0; i < layers.length; i++) {
-                layer = layers[i];
-                kind = u.layerKind(layer);
-                if (kind !== "footage" && kind !== "still" && kind !== "precomp") {
-                    ctx.warn(layer.name + ": not a clip, skipped.");
-                    continue;
-                }
-                if (layer.locked) {
-                    ctx.warn(layer.name + ": locked, skipped.");
-                    continue;
-                }
-                ctx.setStep("Measure " + layer.name);
-                luma = measure(comp, layer, ctx);
-                stops = stopsFor(luma, target, strength, !!args.tameBright);
-                ctx.setStep("Expose " + layer.name);
-                fx = findBalance(layer);
-                if (!fx) {
-                    fx = u.addEffect(layer, "ADBE Exposure2", ctx);
-                    fx.name = EFFECT_NAME;
-                    fx.moveTo(1);
-                }
-                exposureControl(fx).setValue(Math.round(stops * 100) / 100);
-                results.push({ name: layer.name, luma: Math.round(luma * 1000) / 1000, stops: Math.round(stops * 100) / 100 });
-            }
+            var results = balanceLayers(comp, u.selectedLayers(comp, 1), args, ctx);
             if (!results.length) {
                 throw u.userError("Select at least one unlocked clip.", "selection");
             }

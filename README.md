@@ -13,16 +13,31 @@ is built.
 | Phase | Scope | State |
 | --- | --- | --- |
 | 0 · Foundation | Panel shell, host API with one undo step per action, settings, logging, build and debug setup | **Built** |
-| 1 · Core tools | Project (export, size, bin, purge), FX manager, Arrange (6 of 7 actions), Audio fades and volume | **Built**, not yet tried in After Effects |
-| 2 · Library and editing aids | Library, Transitions, Color, Cuts, Ease | Planned (placeholders in the panel) |
-| 3 · Auto Edit | Six-step pipeline and first styles | Planned |
-| 4 · AI tools | Auto Captions, Dialogue, Sound Effects generator, Auto Tracker | Planned |
+| 1 · Core tools | Project (export, size, bin, purge), FX manager, Arrange, Audio fades and volume | **Built** |
+| 2 · Library and editing aids | Library, Transitions, Balance brightness, Cuts, Ease curve editor | **Built** |
+| 3 · Auto Edit | Six-step pipeline, three draft styles | **Built** |
+| 4 · AI tools | Auto Captions, Dialogue, Sound Effects generator, Auto Tracker | Not started (placeholder in the panel) |
 
-"Fix frame-blend edges" is shown disabled until its behaviour is defined (PRD open question).
+Not built on purpose: "Fix frame-blend edges" and the Watermark bundle are shown
+disabled until their open questions are answered, and Advanced reverb (P2) is listed
+as planned.
 
-Everything in Phases 0 and 1 is covered by automated tests against a mock of the
-After Effects object model (see [Testing](#testing)). None of it has been run in
-After Effects yet; the first manual pass on the reference projects is the next step.
+**Nothing has been run inside After Effects yet.** Everything is covered by
+automated tests against a mock of the After Effects object model (see
+[Testing](#testing)), and the panel UI has been checked in a browser. The next step
+is the PRD's manual pass on the 3 reference projects. Things most likely to need
+adjusting there:
+
+- **Effect parameter indices in the recipes** (`recipes/`), written from the Effect
+  Controls order without visual review: Radial Blur, Twirl, Turbulent Displace,
+  Tint and Vibrance in particular. A wrong index is skipped with a warning, not a
+  failure, and fixing it is a JSON edit.
+- **The Exposure control** used by Balance brightness (`ADBE Exposure2-0003`, then
+  index 3). If neither matches, the action stops with a clear message.
+- **Look and feel of transitions, styles and grades**: all are first drafts that
+  need tuning and sign-off (PRD open question).
+- **Split text by word** positions on real fonts, and **Render and convert** with
+  the local render templates and ffmpeg build.
 
 ## Requirements
 
@@ -132,9 +147,14 @@ without the template's generator, so every file in the repo is ours and readable
 ## Known limits of this build
 
 - Split text by word handles point text only (box text and text with animators are
-  skipped with a reason). Word positions are measured, so check them on real fonts.
+  skipped with a reason).
 - Un-precompose carries over a static transform through a parent null; keyframed
   transforms, effects, masks, opacity and time remapping on the precomp layer are
   reported, not applied.
-- Render and convert blocks After Effects while the render queue runs (After
-  Effects' own behaviour); only the ffmpeg conversion step can be cancelled.
+- Render and convert, scene detection, Balance brightness and Auto Edit block After
+  Effects while they run (ExtendScript is single-threaded); the panel shows a
+  progress overlay, and only the ffmpeg conversion can be cancelled.
+- Dragging library items onto the timeline is not supported by CEP; items are
+  inserted at the playhead instead.
+- Transition previews play from `<library>/transitions/previews/<id>.webm` when
+  present; none are bundled yet.

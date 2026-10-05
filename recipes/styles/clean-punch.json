@@ -1,0 +1,13 @@
+{
+  "id": "clean-punch",
+  "name": "Clean Punch",
+  "description": "Gentler ramps, punch-ins without shake, blur flash on cuts, clean grade.",
+  "steps": { "precompose": true, "effects": true, "transitionIn": true, "cuts": true, "extra": false, "cc": true },
+  "velocity": { "enabled": true, "strength": 0.4, "frameBlend": "frameMix" },
+  "zoom": { "enabled": true, "amount": 12, "duration": 10, "push": 3 },
+  "shake": { "enabled": false, "amplitude": 18, "frequency": 10, "decay": 8 },
+  "transitionIn": { "type": "flash", "strength": 0.8 },
+  "cuts": { "type": "blur-flash", "intensity": 0.7, "duration": 8 },
+  "extra": { "type": "none", "intensity": 0.5 },
+  "cc": { "look": "clean-punch", "balance": true }
+}

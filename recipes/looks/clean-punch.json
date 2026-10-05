@@ -1,0 +1,17 @@
+{
+  "id": "clean-punch",
+  "name": "Clean punch",
+  "lengthFrames": 30,
+  "notes": "Auto Edit step 6 grade: clean, slightly brighter, more vibrant.",
+  "layers": [
+    {
+      "type": "adjustment",
+      "name": "Clean punch",
+      "effects": [
+        { "matchName": "ADBE Brightness & Contrast 2", "params": { "1": 3, "2": 12 } },
+        { "matchName": "ADBE Vibrance", "params": { "1": 25, "2": 0 } },
+        { "matchName": "ADBE Sharpen", "params": { "1": 8 } }
+      ]
+    }
+  ]
+}

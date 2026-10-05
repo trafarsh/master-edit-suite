@@ -281,7 +281,9 @@ export class Layer {
     tr.add(new Property("ADBE Opacity", 100));
     this.root.add(new PropertyGroup("ADBE Effect Parade", "Effects")).owner = this;
     this.root.add(new PropertyGroup("ADBE Marker", "Marker"));
+    this.root.add(new Property("ADBE Time Remapping", 0, "Time Remap"));
   }
+  frameBlendingType = 0;
   get index() {
     return this.comp.layerList.indexOf(this) + 1;
   }
@@ -345,6 +347,7 @@ export class CompItem extends Item {
   selectionOrder: Layer[] = [];
   selectedProperties: (Property | PropertyGroup)[] = [];
   time = 0;
+  frameBlending = false;
   frameRate = 30;
   pixelAspect = 1;
   displayStartTime = 0;
@@ -374,6 +377,19 @@ export class CompItem extends Item {
         const l = this.addLayer(new AVLayer("Null"), 0, duration);
         l.nullLayer = true;
         return l;
+      },
+      precompose: (indices: number[], name: string) => {
+        const layer = this.layer(indices[0]);
+        const inner = project.addItem(new CompItem(name, this.width, this.height, this.duration));
+        const idx = this.layerList.indexOf(layer);
+        this.layerList.splice(idx, 1);
+        layer.comp = inner;
+        inner.layerList.push(layer);
+        const pl = new AVLayer(name);
+        Object.assign(pl, { comp: this, source: inner, _start: 0, _in: 0, _out: this.duration, selected: layer.selected });
+        this.layerList.splice(idx, 0, pl);
+        this.selectionOrder = this.selectionOrder.map((l) => (l === layer ? pl : l));
+        return inner;
       },
       add: (item: FootageItem | CompItem) => {
         const footage = item as FootageItem;
@@ -498,6 +514,7 @@ export function createHost() {
     RQItemStatus: { QUEUED: 1 },
     SceneEditDetectionMode: { MARKERS: 1, SPLIT: 2, SPLIT_PRECOMP: 3, NONE: 4 },
     BlendingMode: { NORMAL: 1, SCREEN: 2, OVERLAY: 3, ADD: 4 },
+    FrameBlendingType: { NO_FRAME_BLEND: 0, FRAME_MIX: 1, PIXEL_MOTION: 2 },
     File: MockFile,
     ImportOptions: class {
       constructor(public file: MockFile) {}

@@ -40,6 +40,7 @@ export interface Settings {
   balanceTarget: number;
   balanceStrength: number;
   balanceTame: boolean;
+  autoEditStyle: string;
   lastModule: string;
   easePresets: EaseCurve[];
 }
@@ -66,6 +67,7 @@ export const DEFAULT_SETTINGS: Settings = {
   balanceTarget: 5,
   balanceStrength: 0.8,
   balanceTame: false,
+  autoEditStyle: "hard-filmstyle",
   lastModule: "general",
   easePresets: [],
 };
@@ -98,7 +100,7 @@ export function normalizeSettings(raw: unknown): Settings {
   const out: Settings = { ...DEFAULT_SETTINGS, easePresets: [] };
   if (!raw || typeof raw !== "object") return out;
   const r = raw as Record<string, unknown>;
-  for (const key of ["libraryPath", "outputFolder", "ffmpegPath", "renderTemplate", "lastModule"] as const) {
+  for (const key of ["libraryPath", "outputFolder", "ffmpegPath", "renderTemplate", "lastModule", "autoEditStyle"] as const) {
     if (typeof r[key] === "string") out[key] = (r[key] as string).trim();
   }
   if (!out.renderTemplate) out.renderTemplate = DEFAULT_SETTINGS.renderTemplate;
